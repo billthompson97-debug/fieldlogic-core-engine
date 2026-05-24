@@ -1,0 +1,43 @@
+[
+  {
+    "source": "tech_measure",
+    "capturedBy": "daniel_johnson",
+    "jobId": "cbi_job_3001",
+    "payload": {
+      "scopeType": "tub_to_shower",
+      "slabFoundation": true,
+      "plumbingRelocationRequired": false,
+      "scopeRiskScore": 34
+    }
+  },
+  {
+    "source": "production",
+    "capturedBy": "installer_lvl5_12",
+    "jobId": "cbi_job_3001",
+    "payload": {
+      "phase": "waterproofing",
+      "laborVariancePercent": 8,
+      "photoComplianceRate": 100
+    }
+  },
+  {
+    "source": "qa",
+    "capturedBy": "production_manager",
+    "jobId": "cbi_job_3001",
+    "payload": {
+      "qaScore": 91,
+      "unresolvedPunchItems": 1,
+      "callbackRiskProbability": 18
+    }
+  },
+  {
+    "source": "homeowner_experience",
+    "capturedBy": "service_department",
+    "jobId": "cbi_job_3001",
+    "payload": {
+      "homeownerExperienceScore": 10,
+      "reviewRequested": true,
+      "reviewReceived": true
+    }
+  }
+]

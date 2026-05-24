@@ -1,0 +1,29 @@
+[
+  {
+    "installerId": "installer_lvl5_12",
+    "jobsCompleted": 4,
+    "averageQaScore": 91,
+    "callbackRate": 0.02,
+    "averageLaborVariancePercent": 5,
+    "photoComplianceRate": 98,
+    "homeownerExperienceScore": 9.7
+  },
+  {
+    "installerId": "installer_lvl4_07",
+    "jobsCompleted": 5,
+    "averageQaScore": 82,
+    "callbackRate": 0.09,
+    "averageLaborVariancePercent": 15,
+    "photoComplianceRate": 84,
+    "homeownerExperienceScore": 7.8
+  },
+  {
+    "installerId": "installer_lvl3_04",
+    "jobsCompleted": 3,
+    "averageQaScore": 85,
+    "callbackRate": 0.05,
+    "averageLaborVariancePercent": 9,
+    "photoComplianceRate": 91,
+    "homeownerExperienceScore": 8.6
+  }
+]

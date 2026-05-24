@@ -1,6 +1,8 @@
 import { handleOperationalEventIntake } from './routes/events/intake';
 import { handleJobSummaryRequest } from './routes/jobs/job-summary';
 import { handleJobTimelineRequest } from './routes/jobs/job-timeline';
+import { handleInstallerBenchmarkRequest } from './routes/benchmarks/installer-benchmarks';
+import { handleJobBenchmarkRequest } from './routes/benchmarks/job-benchmarks';
 
 export interface Env {
   FIELDLOGIC_DB: D1Database;
@@ -28,6 +30,14 @@ export default {
       return handleJobTimelineRequest(jobId, env.FIELDLOGIC_DB);
     }
 
+    if (url.pathname === '/benchmarks/installers') {
+      return handleInstallerBenchmarkRequest(env.FIELDLOGIC_DB);
+    }
+
+    if (url.pathname === '/benchmarks/jobs') {
+      return handleJobBenchmarkRequest(env.FIELDLOGIC_DB);
+    }
+
     const payload = {
       platform: 'FieldLogic',
       engine: 'core',
@@ -37,14 +47,18 @@ export default {
       routes: {
         eventIntake: '/events/intake',
         jobSummary: '/jobs/:id/summary',
-        jobTimeline: '/jobs/:id/timeline'
+        jobTimeline: '/jobs/:id/timeline',
+        installerBenchmarks: '/benchmarks/installers',
+        jobBenchmarks: '/benchmarks/jobs'
       },
       capabilities: {
         eventPersistence: true,
         operationalMemory: true,
         jobStateTracking: true,
         operationalSummaries: true,
-        operationalReplay: true
+        operationalReplay: true,
+        operationalBenchmarking: true,
+        liveOperationalScoring: true
       }
     };
 

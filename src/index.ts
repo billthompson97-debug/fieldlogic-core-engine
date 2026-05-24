@@ -3,6 +3,7 @@ import { handleJobSummaryRequest } from './routes/jobs/job-summary';
 import { handleJobTimelineRequest } from './routes/jobs/job-timeline';
 import { handleInstallerBenchmarkRequest } from './routes/benchmarks/installer-benchmarks';
 import { handleJobBenchmarkRequest } from './routes/benchmarks/job-benchmarks';
+import { handleCBITelemetryWorkflow } from './routes/workflows/cbi-telemetry';
 
 export interface Env {
   FIELDLOGIC_DB: D1Database;
@@ -14,6 +15,10 @@ export default {
 
     if (url.pathname === '/events/intake' && request.method === 'POST') {
       return handleOperationalEventIntake(request, env);
+    }
+
+    if (url.pathname === '/workflows/cbi/telemetry' && request.method === 'POST') {
+      return handleCBITelemetryWorkflow(request);
     }
 
     if (url.pathname.startsWith('/jobs/') && url.pathname.endsWith('/summary')) {
@@ -46,6 +51,7 @@ export default {
       message: 'FieldLogic operational intelligence layer initialized.',
       routes: {
         eventIntake: '/events/intake',
+        cbiTelemetryWorkflow: '/workflows/cbi/telemetry',
         jobSummary: '/jobs/:id/summary',
         jobTimeline: '/jobs/:id/timeline',
         installerBenchmarks: '/benchmarks/installers',
@@ -58,7 +64,8 @@ export default {
         operationalSummaries: true,
         operationalReplay: true,
         operationalBenchmarking: true,
-        liveOperationalScoring: true
+        liveOperationalScoring: true,
+        cbiTelemetryWorkflow: true
       }
     };
 

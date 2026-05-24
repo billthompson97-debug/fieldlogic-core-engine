@@ -1,0 +1,34 @@
+[
+  {
+    "jobId": "cbi_live_job_4101",
+    "week": 1,
+    "healthScore": 58,
+    "callbackRiskProbability": 72,
+    "activeAnomalies": 3,
+    "marginLeakPercent": 11.2
+  },
+  {
+    "jobId": "cbi_live_job_4101",
+    "week": 2,
+    "healthScore": 74,
+    "callbackRiskProbability": 38,
+    "activeAnomalies": 1,
+    "marginLeakPercent": 5.8
+  },
+  {
+    "jobId": "cbi_live_job_4303",
+    "week": 1,
+    "healthScore": 67,
+    "callbackRiskProbability": 38,
+    "activeAnomalies": 2,
+    "marginLeakPercent": 12.7
+  },
+  {
+    "jobId": "cbi_live_job_4303",
+    "week": 2,
+    "healthScore": 61,
+    "callbackRiskProbability": 51,
+    "activeAnomalies": 3,
+    "marginLeakPercent": 14.1
+  }
+]

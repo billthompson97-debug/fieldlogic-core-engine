@@ -1,0 +1,19 @@
+{
+  "id": "evt_cbi_001",
+  "type": "qa.event.logged",
+  "jobId": "cbi_job_1024",
+  "occurredAt": "2026-05-24T18:30:00Z",
+  "capturedBy": "production_manager",
+  "source": "fieldlogic",
+  "payload": {
+    "installerId": "installer_lvl5_12",
+    "phase": "waterproofing",
+    "qaScore": 82,
+    "issues": [
+      "incomplete_photo_documentation",
+      "corner_membrane_overlap_requires_review"
+    ],
+    "callbackRiskProbability": 41,
+    "recommendedAction": "secondary_qa_review"
+  }
+}

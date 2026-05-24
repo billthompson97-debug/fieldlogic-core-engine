@@ -1,0 +1,11 @@
+name = "fieldlogic-core-engine"
+main = "src/index.ts"
+compatibility_date = "2026-05-24"
+workers_dev = true
+
+[observability]
+enabled = true
+
+[vars]
+APP_NAME = "FieldLogic"
+ENVIRONMENT = "development"

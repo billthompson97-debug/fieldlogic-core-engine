@@ -1,0 +1,35 @@
+[
+  {
+    "jobId": "cbi_live_job_4101",
+    "callbackCategory": "waterproofing_review",
+    "daysAfterCompletion": 14,
+    "installerId": "installer_lvl4_07",
+    "initialQaScore": 79,
+    "homeownerConcern": "water visible near outside vertical transition",
+    "laborVariancePercent": 16,
+    "scheduleDelayDays": 2,
+    "resolutionStatus": "secondary_qa_required"
+  },
+  {
+    "jobId": "cbi_live_job_4102",
+    "callbackCategory": "glass_alignment",
+    "daysAfterCompletion": 9,
+    "installerId": "installer_lvl5_12",
+    "initialQaScore": 88,
+    "homeownerConcern": "door alignment adjustment requested",
+    "laborVariancePercent": 4,
+    "scheduleDelayDays": 0,
+    "resolutionStatus": "service_adjustment_completed"
+  },
+  {
+    "jobId": "cbi_live_job_4103",
+    "callbackCategory": "finish_detail",
+    "daysAfterCompletion": 21,
+    "installerId": "installer_lvl3_04",
+    "initialQaScore": 83,
+    "homeownerConcern": "trim finish inconsistency near vanity edge",
+    "laborVariancePercent": 11,
+    "scheduleDelayDays": 1,
+    "resolutionStatus": "touchup_scheduled"
+  }
+]

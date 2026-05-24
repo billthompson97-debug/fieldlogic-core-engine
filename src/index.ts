@@ -1,5 +1,6 @@
 import { handleOperationalEventIntake } from './routes/events/intake';
 import { handleJobSummaryRequest } from './routes/jobs/job-summary';
+import { handleJobTimelineRequest } from './routes/jobs/job-timeline';
 
 export interface Env {
   FIELDLOGIC_DB: D1Database;
@@ -20,6 +21,13 @@ export default {
       return handleJobSummaryRequest(jobId, env.FIELDLOGIC_DB);
     }
 
+    if (url.pathname.startsWith('/jobs/') && url.pathname.endsWith('/timeline')) {
+      const parts = url.pathname.split('/');
+      const jobId = parts[2];
+
+      return handleJobTimelineRequest(jobId, env.FIELDLOGIC_DB);
+    }
+
     const payload = {
       platform: 'FieldLogic',
       engine: 'core',
@@ -28,13 +36,15 @@ export default {
       message: 'FieldLogic operational intelligence layer initialized.',
       routes: {
         eventIntake: '/events/intake',
-        jobSummary: '/jobs/:id/summary'
+        jobSummary: '/jobs/:id/summary',
+        jobTimeline: '/jobs/:id/timeline'
       },
       capabilities: {
         eventPersistence: true,
         operationalMemory: true,
         jobStateTracking: true,
-        operationalSummaries: true
+        operationalSummaries: true,
+        operationalReplay: true
       }
     };
 

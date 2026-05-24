@@ -1,0 +1,42 @@
+[
+  {
+    "jobId": "cbi_live_job_4101",
+    "sharedSignals": [
+      {
+        "sourceAgent": "qa_agent",
+        "category": "qa",
+        "severity": "high",
+        "message": "Waterproofing review required"
+      },
+      {
+        "sourceAgent": "callback_agent",
+        "category": "callback",
+        "severity": "high",
+        "message": "Elevated callback probability detected"
+      },
+      {
+        "sourceAgent": "margin_agent",
+        "category": "margin",
+        "severity": "moderate",
+        "message": "Margin leakage trend identified"
+      }
+    ],
+    "coordinatedActions": [
+      {
+        "responsibleAgent": "production_agent",
+        "action": "Review QA remediation workflow",
+        "priority": "critical"
+      },
+      {
+        "responsibleAgent": "coaching_agent",
+        "action": "Review installer callback patterns",
+        "priority": "critical"
+      },
+      {
+        "responsibleAgent": "operations_agent",
+        "action": "Review labor and material variance drivers",
+        "priority": "elevated"
+      }
+    ]
+  }
+]

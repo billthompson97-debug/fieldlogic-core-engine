@@ -1,0 +1,32 @@
+[
+  {
+    "jobId": "cbi_live_job_4101",
+    "recommendationCategory": "secondary_qa_review",
+    "recommendationApplied": true,
+    "callbackOccurred": false,
+    "qaImproved": true,
+    "laborVarianceImproved": false,
+    "homeownerExperienceImproved": true,
+    "marginLeakReduced": true
+  },
+  {
+    "jobId": "cbi_live_job_4303",
+    "recommendationCategory": "schedule_dependency_review",
+    "recommendationApplied": true,
+    "callbackOccurred": false,
+    "qaImproved": false,
+    "laborVarianceImproved": true,
+    "homeownerExperienceImproved": true,
+    "marginLeakReduced": true
+  },
+  {
+    "jobId": "cbi_live_job_4201",
+    "recommendationCategory": "photo_capture_enforcement",
+    "recommendationApplied": false,
+    "callbackOccurred": true,
+    "qaImproved": false,
+    "laborVarianceImproved": false,
+    "homeownerExperienceImproved": false,
+    "marginLeakReduced": false
+  }
+]

@@ -1,0 +1,98 @@
+[
+  {
+    "id": "cbi_prod_evt_0001",
+    "type": "tech_measure.completed",
+    "jobId": "cbi_real_job_seed_001",
+    "occurredAt": "2026-05-24T15:00:00Z",
+    "capturedBy": "production_manager",
+    "source": "fieldlogic",
+    "payload": {
+      "scopeType": "tub_to_shower",
+      "existingCondition": "older tub alcove with possible framing correction needed",
+      "slabFoundation": true,
+      "plumbingRelocationRequired": false,
+      "materialSystem": "wet_area_wall_system",
+      "scopeRiskScore": 34,
+      "requiredPhotos": [
+        "full_before_view",
+        "valve_wall",
+        "drain_area",
+        "ceiling_and_ventilation",
+        "floor_transition"
+      ]
+    }
+  },
+  {
+    "id": "cbi_prod_evt_0002",
+    "type": "labor.phase.completed",
+    "jobId": "cbi_real_job_seed_001",
+    "occurredAt": "2026-05-24T18:15:00Z",
+    "capturedBy": "lead_installer",
+    "source": "fieldlogic",
+    "payload": {
+      "phase": "demo",
+      "installerId": "installer_seed_01",
+      "plannedHours": 6,
+      "actualHours": 7.25,
+      "laborVariancePercent": 20.8,
+      "delayReason": "additional wall prep discovered after demo",
+      "photoComplianceRate": 90
+    }
+  },
+  {
+    "id": "cbi_prod_evt_0003",
+    "type": "qa.event.logged",
+    "jobId": "cbi_real_job_seed_001",
+    "occurredAt": "2026-05-24T21:00:00Z",
+    "capturedBy": "production_manager",
+    "source": "fieldlogic",
+    "payload": {
+      "phase": "waterproofing",
+      "qaScore": 82,
+      "unresolvedPunchItems": 2,
+      "findings": [
+        "photo documentation incomplete before wall close-in",
+        "corner transition requires secondary review"
+      ],
+      "callbackRiskProbability": 41,
+      "recommendedAction": "secondary_qa_review_before_finish"
+    }
+  },
+  {
+    "id": "cbi_prod_evt_0004",
+    "type": "callback.logged",
+    "jobId": "cbi_real_job_seed_002",
+    "occurredAt": "2026-05-24T22:30:00Z",
+    "capturedBy": "service_department",
+    "source": "fieldlogic",
+    "payload": {
+      "scopeType": "tub_to_shower",
+      "installerId": "installer_seed_02",
+      "daysAfterCompletion": 18,
+      "homeownerConcern": "water visible near outside corner transition",
+      "callbackCategory": "waterproofing_review",
+      "initialQaScore": 81,
+      "laborVariancePercent": 14,
+      "recommendedAction": "secondary_waterproofing_inspection"
+    }
+  },
+  {
+    "id": "cbi_prod_evt_0005",
+    "type": "margin.signal.created",
+    "jobId": "cbi_real_job_seed_002",
+    "occurredAt": "2026-05-24T23:15:00Z",
+    "capturedBy": "operations",
+    "source": "fieldlogic",
+    "payload": {
+      "materialVariancePercent": 9,
+      "laborVariancePercent": 17,
+      "scheduleDelayDays": 3,
+      "estimatedMarginLeakPercent": 8.6,
+      "primaryDrivers": [
+        "labor_overage",
+        "additional_material_usage",
+        "callback_review_time"
+      ]
+    }
+  }
+]

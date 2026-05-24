@@ -1,0 +1,36 @@
+[
+  {
+    "jobId": "cbi_live_job_4301",
+    "scheduleDelayDays": 4,
+    "laborVariancePercent": 18,
+    "materialVariancePercent": 7,
+    "estimatedMarginLeakPercent": 9.2,
+    "primaryDrivers": [
+      "additional_demo_time",
+      "wall_prep_corrections",
+      "material_reorder"
+    ]
+  },
+  {
+    "jobId": "cbi_live_job_4302",
+    "scheduleDelayDays": 1,
+    "laborVariancePercent": 6,
+    "materialVariancePercent": 3,
+    "estimatedMarginLeakPercent": 2.1,
+    "primaryDrivers": [
+      "minor_schedule_shift"
+    ]
+  },
+  {
+    "jobId": "cbi_live_job_4303",
+    "scheduleDelayDays": 5,
+    "laborVariancePercent": 21,
+    "materialVariancePercent": 10,
+    "estimatedMarginLeakPercent": 12.7,
+    "primaryDrivers": [
+      "callback_review",
+      "glass_delay",
+      "additional_finish_work"
+    ]
+  }
+]

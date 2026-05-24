@@ -1,0 +1,18 @@
+{
+  "id": "evt_callback_2044",
+  "type": "callback.logged",
+  "jobId": "cbi_job_2044",
+  "occurredAt": "2026-05-24T21:15:00Z",
+  "capturedBy": "service_department",
+  "source": "fieldlogic",
+  "payload": {
+    "installerId": "installer_lvl4_07",
+    "scopeType": "tub_to_shower",
+    "callbackCategory": "waterproofing_review",
+    "homeownerConcern": "water_visible_at_outside_corner_transition",
+    "daysAfterCompletion": 18,
+    "initialQaScore": 81,
+    "laborVariancePercent": 14,
+    "recommendedAction": "secondary_waterproofing_inspection"
+  }
+}

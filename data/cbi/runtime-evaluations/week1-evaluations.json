@@ -1,0 +1,42 @@
+[
+  {
+    "jobId": "cbi_live_job_4101",
+    "operationalState": "critical",
+    "anomalySignals": [
+      "qa_score_below_standard",
+      "labor_variance_above_target",
+      "margin_leak_detected"
+    ],
+    "callbackRiskProbability": 72,
+    "marginRiskSignal": "high",
+    "recommendedActions": [
+      "Schedule secondary QA review",
+      "Review installer phase execution",
+      "Review labor, material, and callback drivers"
+    ]
+  },
+  {
+    "jobId": "cbi_live_job_4202",
+    "operationalState": "stable",
+    "anomalySignals": [],
+    "callbackRiskProbability": 9,
+    "marginRiskSignal": "low",
+    "recommendedActions": [
+      "Proceed with closeout and review request"
+    ]
+  },
+  {
+    "jobId": "cbi_live_job_4303",
+    "operationalState": "watch",
+    "anomalySignals": [
+      "schedule_delay_detected",
+      "margin_leak_detected"
+    ],
+    "callbackRiskProbability": 38,
+    "marginRiskSignal": "high",
+    "recommendedActions": [
+      "Review schedule dependency chain",
+      "Review labor, material, and callback drivers"
+    ]
+  }
+]

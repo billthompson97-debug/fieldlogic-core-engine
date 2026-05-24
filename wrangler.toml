@@ -9,3 +9,8 @@ enabled = true
 [vars]
 APP_NAME = "FieldLogic"
 ENVIRONMENT = "development"
+
+[[d1_databases]]
+binding = "FIELDLOGIC_DB"
+database_name = "fieldlogic-db"
+database_id = "local-dev-placeholder"

@@ -44,10 +44,27 @@ export async function handleOperationalEventIntake(
       )
       .run();
 
+    const healthScore = event.type.includes('callback')
+      ? 58
+      : event.type.includes('qa')
+      ? 82
+      : 90;
+
+    const callbackRiskProbability = event.type.includes('callback')
+      ? 74
+      : 34;
+
+    const anomalySignals = event.type.includes('callback')
+      ? ['callback_activity_detected']
+      : [];
+
     const operationalSummary = {
       jobId: event.jobId,
       latestEventType: event.type,
       latestEventTimestamp: event.occurredAt,
+      healthScore,
+      callbackRiskProbability,
+      anomalySignals,
       operationalStatus: 'event_recorded'
     };
 

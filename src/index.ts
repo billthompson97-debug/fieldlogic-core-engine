@@ -1,13 +1,15 @@
 import { handleOperationalEventIntake } from './routes/events/intake';
 
-export interface Env {}
+export interface Env {
+  FIELDLOGIC_DB: D1Database;
+}
 
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
 
     if (url.pathname === '/events/intake' && request.method === 'POST') {
-      return handleOperationalEventIntake(request);
+      return handleOperationalEventIntake(request, env);
     }
 
     const payload = {
@@ -18,6 +20,11 @@ export default {
       message: 'FieldLogic operational intelligence layer initialized.',
       routes: {
         eventIntake: '/events/intake'
+      },
+      capabilities: {
+        eventPersistence: true,
+        operationalMemory: true,
+        jobStateTracking: true
       }
     };
 

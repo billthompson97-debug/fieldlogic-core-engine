@@ -6,6 +6,7 @@ import { handleJobBenchmarkRequest } from './routes/benchmarks/job-benchmarks';
 import { handleCBITelemetryWorkflow } from './routes/workflows/cbi-telemetry';
 import { handleJobsNeedingAttentionRequest } from './routes/runtime/jobs-needing-attention';
 import { handleDailyBriefRequest } from './routes/runtime/daily-brief';
+import { handleDailyBriefTextRequest } from './routes/runtime/daily-brief-text';
 
 export interface Env {
   FIELDLOGIC_DB: D1Database;
@@ -29,6 +30,10 @@ export default {
 
     if (url.pathname === '/runtime/daily-brief') {
       return handleDailyBriefRequest(env.FIELDLOGIC_DB);
+    }
+
+    if (url.pathname === '/runtime/daily-brief-text') {
+      return handleDailyBriefTextRequest(env.FIELDLOGIC_DB);
     }
 
     if (url.pathname.startsWith('/jobs/') && url.pathname.endsWith('/summary')) {
@@ -64,6 +69,7 @@ export default {
         cbiTelemetryWorkflow: '/workflows/cbi/telemetry',
         jobsNeedingAttention: '/runtime/jobs-needing-attention',
         dailyBrief: '/runtime/daily-brief',
+        dailyBriefText: '/runtime/daily-brief-text',
         jobSummary: '/jobs/:id/summary',
         jobTimeline: '/jobs/:id/timeline',
         installerBenchmarks: '/benchmarks/installers',
@@ -79,7 +85,8 @@ export default {
         liveOperationalScoring: true,
         cbiTelemetryWorkflow: true,
         jobsNeedingAttention: true,
-        dailyBrief: true
+        dailyBrief: true,
+        dailyBriefText: true
       }
     };
 

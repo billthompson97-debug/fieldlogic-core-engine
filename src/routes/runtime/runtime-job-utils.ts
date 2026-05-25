@@ -46,6 +46,11 @@ function toNumber(value: unknown, fallback: number): number {
   return typeof value === 'number' ? value : fallback;
 }
 
+function isActionCompletionEvent(event: SavedOperationalEvent): boolean {
+  const payload = safeParsePayload(event.payload_json);
+  return typeof payload.actionCompleted === 'string' || typeof payload.completedBy === 'string';
+}
+
 function adjustForOutcome(
   healthScore: number,
   callbackRiskProbability: number,
@@ -274,6 +279,8 @@ export async function getLatestRuntimeJobs(db: D1Database): Promise<RuntimeJob[]
   const latestActionByJob = new Map<string, ActionOutcomeRow>();
 
   for (const row of rows.results ?? []) {
+    if (isActionCompletionEvent(row)) continue;
+
     if (!latestByJob.has(row.job_id)) {
       latestByJob.set(row.job_id, row);
     }

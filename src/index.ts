@@ -18,7 +18,7 @@ export default {
     }
 
     if (url.pathname === '/workflows/cbi/telemetry' && request.method === 'POST') {
-      return handleCBITelemetryWorkflow(request);
+      return handleCBITelemetryWorkflow(request, env);
     }
 
     if (url.pathname.startsWith('/jobs/') && url.pathname.endsWith('/summary')) {

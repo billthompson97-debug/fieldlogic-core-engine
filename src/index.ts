@@ -7,6 +7,9 @@ import { handleCBITelemetryWorkflow } from './routes/workflows/cbi-telemetry';
 import { handleJobsNeedingAttentionRequest } from './routes/runtime/jobs-needing-attention';
 import { handleDailyBriefRequest } from './routes/runtime/daily-brief';
 import { handleDailyBriefTextRequest } from './routes/runtime/daily-brief-text';
+import { handleDailyActionListRequest } from './routes/runtime/daily-action-list';
+import { handleUrgentJobsRequest } from './routes/runtime/urgent-jobs';
+import { handleOwnerJobsRequest } from './routes/runtime/owner-jobs';
 
 export interface Env {
   FIELDLOGIC_DB: D1Database;
@@ -34,6 +37,19 @@ export default {
 
     if (url.pathname === '/runtime/daily-brief-text') {
       return handleDailyBriefTextRequest(env.FIELDLOGIC_DB);
+    }
+
+    if (url.pathname === '/runtime/daily-action-list') {
+      return handleDailyActionListRequest(env.FIELDLOGIC_DB);
+    }
+
+    if (url.pathname === '/runtime/urgent-jobs') {
+      return handleUrgentJobsRequest(env.FIELDLOGIC_DB);
+    }
+
+    if (url.pathname.startsWith('/runtime/owner/')) {
+      const ownerSlug = url.pathname.split('/')[3];
+      return handleOwnerJobsRequest(ownerSlug, env.FIELDLOGIC_DB);
     }
 
     if (url.pathname.startsWith('/jobs/') && url.pathname.endsWith('/summary')) {
@@ -70,6 +86,11 @@ export default {
         jobsNeedingAttention: '/runtime/jobs-needing-attention',
         dailyBrief: '/runtime/daily-brief',
         dailyBriefText: '/runtime/daily-brief-text',
+        dailyActionList: '/runtime/daily-action-list',
+        urgentJobs: '/runtime/urgent-jobs',
+        ownerOperations: '/runtime/owner/operations',
+        ownerService: '/runtime/owner/service',
+        ownerProduction: '/runtime/owner/production',
         jobSummary: '/jobs/:id/summary',
         jobTimeline: '/jobs/:id/timeline',
         installerBenchmarks: '/benchmarks/installers',
@@ -86,7 +107,10 @@ export default {
         cbiTelemetryWorkflow: true,
         jobsNeedingAttention: true,
         dailyBrief: true,
-        dailyBriefText: true
+        dailyBriefText: true,
+        dailyActionList: true,
+        urgentJobs: true,
+        ownerJobs: true
       }
     };
 

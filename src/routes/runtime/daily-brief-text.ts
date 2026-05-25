@@ -29,7 +29,7 @@ function readableOwner(owner: BriefJob['owner']): string {
   if (owner === 'production_manager') return 'Production Manager';
   if (owner === 'service_department') return 'Service Department';
   if (owner === 'operations') return 'Operations';
-  return 'None';
+  return 'Unassigned';
 }
 
 function summarizeJob(event: SavedOperationalEvent): BriefJob {
@@ -106,6 +106,11 @@ function summarizeJob(event: SavedOperationalEvent): BriefJob {
   };
 }
 
+function sortJobsByPriority(jobs: BriefJob[]): BriefJob[] {
+  const rank = { urgent: 2, elevated: 1, normal: 0 };
+  return [...jobs].sort((a, b) => rank[b.priority] - rank[a.priority] || a.healthScore - b.healthScore);
+}
+
 export async function handleDailyBriefTextRequest(db: D1Database): Promise<Response> {
   const rows = await db
     .prepare(
@@ -123,16 +128,21 @@ export async function handleDailyBriefTextRequest(db: D1Database): Promise<Respo
     }
   }
 
-  const jobs = Array.from(latestByJob.values())
-    .map(summarizeJob)
-    .filter(job => job.priority !== 'normal')
-    .sort((a, b) => {
-      const rank = { urgent: 2, elevated: 1, normal: 0 };
-      return rank[b.priority] - rank[a.priority] || a.healthScore - b.healthScore;
-    });
+  const jobs = sortJobsByPriority(
+    Array.from(latestByJob.values())
+      .map(summarizeJob)
+      .filter(job => job.priority !== 'normal')
+  );
 
   const urgentCount = jobs.filter(job => job.priority === 'urgent').length;
   const elevatedCount = jobs.filter(job => job.priority === 'elevated').length;
+
+  const owners: BriefJob['owner'][] = [
+    'operations',
+    'service_department',
+    'production_manager',
+    'none'
+  ];
 
   const lines: string[] = [
     'FieldLogic Daily Brief',
@@ -146,17 +156,25 @@ export async function handleDailyBriefTextRequest(db: D1Database): Promise<Respo
   if (jobs.length === 0) {
     lines.push('No jobs need attention right now.');
   } else {
-    lines.push('Jobs needing attention today:');
+    lines.push('Jobs by owner:');
     lines.push('');
 
-    jobs.forEach((job, index) => {
-      lines.push(`${index + 1}. ${job.jobId}`);
-      lines.push(`Priority: ${job.priority}`);
-      lines.push(`Owner: ${readableOwner(job.owner)}`);
-      lines.push(`Health Score: ${job.healthScore}`);
-      lines.push(`Next Action: ${job.nextAction}`);
+    for (const owner of owners) {
+      const ownerJobs = jobs.filter(job => job.owner === owner);
+
+      if (ownerJobs.length === 0) continue;
+
+      lines.push(`${readableOwner(owner)} (${ownerJobs.length})`);
+
+      ownerJobs.forEach((job, index) => {
+        lines.push(`${index + 1}. ${job.jobId}`);
+        lines.push(`   Priority: ${job.priority}`);
+        lines.push(`   Health Score: ${job.healthScore}`);
+        lines.push(`   Next Action: ${job.nextAction}`);
+      });
+
       lines.push('');
-    });
+    }
   }
 
   return new Response(lines.join('\n'), {

@@ -33,13 +33,30 @@ function toNumber(value: unknown, fallback: number): number {
 function determinePriority(
   healthScore: number,
   callbackRiskProbability: number,
-  unresolvedPunchItems: number
+  unresolvedPunchItems: number,
+  estimatedMarginLeakPercent: number,
+  laborVariancePercent: number,
+  scheduleDelayDays: number
 ): JobSummary['priority'] {
-  if (healthScore < 65 || callbackRiskProbability >= 50 || unresolvedPunchItems >= 3) {
+  if (
+    healthScore < 65 ||
+    callbackRiskProbability >= 50 ||
+    unresolvedPunchItems >= 3 ||
+    estimatedMarginLeakPercent >= 12 ||
+    laborVariancePercent >= 20 ||
+    scheduleDelayDays >= 5
+  ) {
     return 'urgent';
   }
 
-  if (healthScore < 85 || callbackRiskProbability >= 30 || unresolvedPunchItems > 0) {
+  if (
+    healthScore < 85 ||
+    callbackRiskProbability >= 30 ||
+    unresolvedPunchItems > 0 ||
+    estimatedMarginLeakPercent >= 6 ||
+    laborVariancePercent >= 12 ||
+    scheduleDelayDays >= 3
+  ) {
     return 'elevated';
   }
 
@@ -55,12 +72,12 @@ function determineOwner(
     return 'service_department';
   }
 
-  if (eventType.includes('qa') || unresolvedPunchItems > 0) {
-    return 'production_manager';
-  }
-
   if (eventType.includes('margin')) {
     return 'operations';
+  }
+
+  if (eventType.includes('qa') || unresolvedPunchItems > 0) {
+    return 'production_manager';
   }
 
   return 'none';
@@ -77,6 +94,10 @@ function determineNextAction(
 
   if (owner === 'service_department') {
     return 'Contact homeowner and review callback prevention steps';
+  }
+
+  if (owner === 'operations' && priority === 'urgent') {
+    return 'Review margin leak, labor overage, material variance, and schedule delay today';
   }
 
   if (owner === 'operations') {
@@ -142,6 +163,10 @@ export async function handleJobSummaryRequest(
   const qaScore = toNumber(payload.qaScore, 90);
   const callbackRiskProbability = toNumber(payload.callbackRiskProbability, qaScore < 85 ? 38 : 12);
   const unresolvedPunchItems = toNumber(payload.unresolvedPunchItems, 0);
+  const estimatedMarginLeakPercent = toNumber(payload.estimatedMarginLeakPercent, 0);
+  const laborVariancePercent = toNumber(payload.laborVariancePercent, 0);
+  const materialVariancePercent = toNumber(payload.materialVariancePercent, 0);
+  const scheduleDelayDays = toNumber(payload.scheduleDelayDays, 0);
 
   const activeRisks: string[] = [];
   const anomalies: string[] = [];
@@ -162,12 +187,45 @@ export async function handleJobSummaryRequest(
     recommendations.push('Clear punch items before final completion');
   }
 
+  if (estimatedMarginLeakPercent >= 6) {
+    activeRisks.push('margin_leak_watch');
+    recommendations.push('Review labor, material, and schedule cost drivers');
+  }
+
+  if (laborVariancePercent >= 12) {
+    anomalies.push('labor_variance_above_target');
+  }
+
+  if (materialVariancePercent >= 8) {
+    anomalies.push('material_variance_above_target');
+  }
+
+  if (scheduleDelayDays >= 3) {
+    anomalies.push('schedule_delay_detected');
+  }
+
   const healthScore = Math.max(
     0,
-    Math.round(100 - (100 - qaScore) * 0.8 - callbackRiskProbability * 0.25 - unresolvedPunchItems * 4)
+    Math.round(
+      100 -
+        (100 - qaScore) * 0.8 -
+        callbackRiskProbability * 0.25 -
+        unresolvedPunchItems * 4 -
+        estimatedMarginLeakPercent * 1.5 -
+        laborVariancePercent * 0.4 -
+        materialVariancePercent * 0.3 -
+        scheduleDelayDays * 2
+    )
   );
 
-  const priority = determinePriority(healthScore, callbackRiskProbability, unresolvedPunchItems);
+  const priority = determinePriority(
+    healthScore,
+    callbackRiskProbability,
+    unresolvedPunchItems,
+    estimatedMarginLeakPercent,
+    laborVariancePercent,
+    scheduleDelayDays
+  );
   const owner = determineOwner(latestEvent.event_type, callbackRiskProbability, unresolvedPunchItems);
   const nextAction = determineNextAction(owner, priority, recommendations);
 

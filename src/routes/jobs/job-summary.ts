@@ -52,15 +52,22 @@ function adjustForCompletedAction(
 ): { healthScore: number; callbackRiskProbability: number } {
   if (outcome === 'resolved') {
     return {
-      healthScore: Math.min(100, healthScore + 25),
-      callbackRiskProbability: Math.max(0, callbackRiskProbability - 25)
+      healthScore: Math.min(92, healthScore + 18),
+      callbackRiskProbability: Math.max(8, callbackRiskProbability - 22)
     };
   }
 
   if (outcome === 'improved') {
     return {
-      healthScore: Math.min(100, healthScore + 15),
-      callbackRiskProbability: Math.max(0, callbackRiskProbability - 15)
+      healthScore: Math.min(82, healthScore + 10),
+      callbackRiskProbability: Math.max(20, callbackRiskProbability - 10)
+    };
+  }
+
+  if (outcome === 'worse') {
+    return {
+      healthScore: Math.max(0, healthScore - 15),
+      callbackRiskProbability: Math.min(100, callbackRiskProbability + 15)
     };
   }
 
@@ -133,11 +140,15 @@ function determineNextAction(
   latestActionOutcome?: LatestActionOutcome | null
 ): string {
   if (latestActionOutcome?.outcome === 'resolved') {
-    return 'Action resolved. Monitor job before final closeout.';
+    return 'Action resolved. Confirm closeout readiness and keep normal watch.';
   }
 
   if (latestActionOutcome?.outcome === 'improved') {
-    return 'Action improved the job. Monitor before closeout and confirm no new issues appear.';
+    return 'Action improved the job. Keep this on watch before closeout and confirm no new issues appear.';
+  }
+
+  if (latestActionOutcome?.outcome === 'worse') {
+    return 'Action did not fix the issue. Escalate for manager review today.';
   }
 
   if (owner === 'service_department') {

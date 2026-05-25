@@ -82,6 +82,26 @@ export function readableOwner(owner: RuntimeOwner): string {
   return 'Unassigned';
 }
 
+function determineBaseOwner(
+  eventType: string,
+  callbackRiskProbability: number,
+  unresolvedPunchItems: number
+): RuntimeOwner {
+  if (eventType.includes('callback') || callbackRiskProbability >= 50) {
+    return 'service_department';
+  }
+
+  if (eventType.includes('margin')) {
+    return 'operations';
+  }
+
+  if (eventType.includes('qa') || unresolvedPunchItems > 0) {
+    return 'production_manager';
+  }
+
+  return 'none';
+}
+
 function buildNextAction(
   owner: RuntimeOwner,
   priority: RuntimePriority,
@@ -194,14 +214,11 @@ export function scoreRuntimeJob(
       ? 'elevated'
       : 'normal';
 
-  const owner: RuntimeOwner =
-    event.event_type.includes('callback') || adjusted.callbackRiskProbability >= 50
-      ? 'service_department'
-      : event.event_type.includes('margin')
-      ? 'operations'
-      : event.event_type.includes('qa') || unresolvedPunchItems > 0
-      ? 'production_manager'
-      : 'none';
+  const owner = determineBaseOwner(
+    event.event_type,
+    baseCallbackRiskProbability,
+    unresolvedPunchItems
+  );
 
   const nextAction = buildNextAction(
     owner,

@@ -86,37 +86,46 @@ function determineOwner(
 function determineNextAction(
   owner: JobSummary['owner'],
   priority: JobSummary['priority'],
-  recommendations: string[]
+  qaScore: number,
+  callbackRiskProbability: number,
+  unresolvedPunchItems: number,
+  estimatedMarginLeakPercent: number,
+  laborVariancePercent: number,
+  materialVariancePercent: number,
+  scheduleDelayDays: number
 ): string {
-  if (owner === 'service_department' && priority === 'urgent') {
-    return 'Contact homeowner, schedule callback inspection, and review QA history';
-  }
-
   if (owner === 'service_department') {
-    return 'Contact homeowner and review callback prevention steps';
-  }
+    const parts = ['Contact homeowner'];
 
-  if (owner === 'operations' && priority === 'urgent') {
-    return 'Review margin leak, labor overage, material variance, and schedule delay today';
+    if (priority === 'urgent') parts.push('schedule callback inspection');
+    if (callbackRiskProbability >= 50) parts.push(`review callback risk at ${callbackRiskProbability}%`);
+    if (qaScore < 85) parts.push(`review QA score of ${qaScore}`);
+
+    return `${parts.join(', ')}.`;
   }
 
   if (owner === 'operations') {
-    return 'Review margin and schedule exposure';
-  }
+    const parts = ['Review margin exposure'];
 
-  if (owner === 'production_manager' && recommendations.length > 0) {
-    return recommendations[0];
+    if (estimatedMarginLeakPercent > 0) parts.push(`margin leak ${estimatedMarginLeakPercent}%`);
+    if (laborVariancePercent > 0) parts.push(`labor variance ${laborVariancePercent}%`);
+    if (materialVariancePercent > 0) parts.push(`material variance ${materialVariancePercent}%`);
+    if (scheduleDelayDays > 0) parts.push(`${scheduleDelayDays} schedule delay day(s)`);
+
+    return `${parts.join(', ')}.`;
   }
 
   if (owner === 'production_manager') {
-    return 'Review job before closeout';
+    const parts = ['Perform secondary QA verification'];
+
+    if (qaScore < 85) parts.push(`QA score is ${qaScore}`);
+    if (unresolvedPunchItems > 0) parts.push(`clear ${unresolvedPunchItems} punch item(s)`);
+    if (callbackRiskProbability >= 30) parts.push(`review callback risk at ${callbackRiskProbability}% before closeout`);
+
+    return `${parts.join(', ')}.`;
   }
 
-  if (priority === 'normal') {
-    return 'Continue normal job progression';
-  }
-
-  return recommendations[0] ?? 'Review job status';
+  return 'Continue normal job progression.';
 }
 
 export async function handleJobSummaryRequest(
@@ -227,7 +236,17 @@ export async function handleJobSummaryRequest(
     scheduleDelayDays
   );
   const owner = determineOwner(latestEvent.event_type, callbackRiskProbability, unresolvedPunchItems);
-  const nextAction = determineNextAction(owner, priority, recommendations);
+  const nextAction = determineNextAction(
+    owner,
+    priority,
+    qaScore,
+    callbackRiskProbability,
+    unresolvedPunchItems,
+    estimatedMarginLeakPercent,
+    laborVariancePercent,
+    materialVariancePercent,
+    scheduleDelayDays
+  );
 
   const summary: JobSummary = {
     jobId,

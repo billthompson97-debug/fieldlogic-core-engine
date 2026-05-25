@@ -11,6 +11,8 @@ import { handleDailyBriefTextRequest } from './routes/runtime/daily-brief-text';
 import { handleDailyActionListRequest } from './routes/runtime/daily-action-list';
 import { handleUrgentJobsRequest } from './routes/runtime/urgent-jobs';
 import { handleOwnerJobsRequest } from './routes/runtime/owner-jobs';
+import { handleCompleteActionRequest } from './routes/runtime/complete-action';
+import { handleActionOutcomesRequest } from './routes/runtime/action-outcomes';
 
 export interface Env {
   FIELDLOGIC_DB: D1Database;
@@ -30,6 +32,14 @@ export default {
 
     if (url.pathname === '/workflows/cbi/daily-job-note' && request.method === 'POST') {
       return handleCBIDailyJobNoteRequest(request, env.FIELDLOGIC_DB);
+    }
+
+    if (url.pathname === '/runtime/complete-action' && request.method === 'POST') {
+      return handleCompleteActionRequest(request, env.FIELDLOGIC_DB);
+    }
+
+    if (url.pathname === '/runtime/action-outcomes') {
+      return handleActionOutcomesRequest(env.FIELDLOGIC_DB);
     }
 
     if (url.pathname === '/runtime/jobs-needing-attention') {
@@ -89,6 +99,8 @@ export default {
         eventIntake: '/events/intake',
         cbiTelemetryWorkflow: '/workflows/cbi/telemetry',
         cbiDailyJobNote: '/workflows/cbi/daily-job-note',
+        completeAction: '/runtime/complete-action',
+        actionOutcomes: '/runtime/action-outcomes',
         jobsNeedingAttention: '/runtime/jobs-needing-attention',
         dailyBrief: '/runtime/daily-brief',
         dailyBriefText: '/runtime/daily-brief-text',
@@ -112,6 +124,8 @@ export default {
         liveOperationalScoring: true,
         cbiTelemetryWorkflow: true,
         cbiDailyJobNote: true,
+        actionCompletion: true,
+        outcomeTracking: true,
         jobsNeedingAttention: true,
         dailyBrief: true,
         dailyBriefText: true,

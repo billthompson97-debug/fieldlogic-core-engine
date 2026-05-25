@@ -4,6 +4,7 @@ import { handleJobTimelineRequest } from './routes/jobs/job-timeline';
 import { handleInstallerBenchmarkRequest } from './routes/benchmarks/installer-benchmarks';
 import { handleJobBenchmarkRequest } from './routes/benchmarks/job-benchmarks';
 import { handleCBITelemetryWorkflow } from './routes/workflows/cbi-telemetry';
+import { handleCBIDailyJobNoteRequest } from './routes/workflows/cbi-daily-job-note';
 import { handleJobsNeedingAttentionRequest } from './routes/runtime/jobs-needing-attention';
 import { handleDailyBriefRequest } from './routes/runtime/daily-brief';
 import { handleDailyBriefTextRequest } from './routes/runtime/daily-brief-text';
@@ -25,6 +26,10 @@ export default {
 
     if (url.pathname === '/workflows/cbi/telemetry' && request.method === 'POST') {
       return handleCBITelemetryWorkflow(request, env);
+    }
+
+    if (url.pathname === '/workflows/cbi/daily-job-note' && request.method === 'POST') {
+      return handleCBIDailyJobNoteRequest(request, env.FIELDLOGIC_DB);
     }
 
     if (url.pathname === '/runtime/jobs-needing-attention') {
@@ -83,6 +88,7 @@ export default {
       routes: {
         eventIntake: '/events/intake',
         cbiTelemetryWorkflow: '/workflows/cbi/telemetry',
+        cbiDailyJobNote: '/workflows/cbi/daily-job-note',
         jobsNeedingAttention: '/runtime/jobs-needing-attention',
         dailyBrief: '/runtime/daily-brief',
         dailyBriefText: '/runtime/daily-brief-text',
@@ -105,6 +111,7 @@ export default {
         operationalBenchmarking: true,
         liveOperationalScoring: true,
         cbiTelemetryWorkflow: true,
+        cbiDailyJobNote: true,
         jobsNeedingAttention: true,
         dailyBrief: true,
         dailyBriefText: true,

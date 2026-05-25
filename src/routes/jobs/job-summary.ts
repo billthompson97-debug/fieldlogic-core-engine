@@ -71,16 +71,8 @@ function determineNextAction(
   priority: JobSummary['priority'],
   recommendations: string[]
 ): string {
-  if (recommendations.length > 0) {
-    return recommendations[0];
-  }
-
-  if (priority === 'normal') {
-    return 'Continue normal job progression';
-  }
-
-  if (owner === 'production_manager') {
-    return 'Review job before closeout';
+  if (owner === 'service_department' && priority === 'urgent') {
+    return 'Contact homeowner, schedule callback inspection, and review QA history';
   }
 
   if (owner === 'service_department') {
@@ -91,7 +83,19 @@ function determineNextAction(
     return 'Review margin and schedule exposure';
   }
 
-  return 'Review job status';
+  if (owner === 'production_manager' && recommendations.length > 0) {
+    return recommendations[0];
+  }
+
+  if (owner === 'production_manager') {
+    return 'Review job before closeout';
+  }
+
+  if (priority === 'normal') {
+    return 'Continue normal job progression';
+  }
+
+  return recommendations[0] ?? 'Review job status';
 }
 
 export async function handleJobSummaryRequest(

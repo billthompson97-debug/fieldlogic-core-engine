@@ -38,6 +38,51 @@ export function readableOwner(owner: RuntimeOwner): string {
   return 'Unassigned';
 }
 
+function buildNextAction(
+  owner: RuntimeOwner,
+  priority: RuntimePriority,
+  qaScore: number,
+  callbackRiskProbability: number,
+  unresolvedPunchItems: number,
+  estimatedMarginLeakPercent: number,
+  laborVariancePercent: number,
+  materialVariancePercent: number,
+  scheduleDelayDays: number
+): string {
+  if (owner === 'service_department') {
+    const parts = ['Contact homeowner'];
+
+    if (priority === 'urgent') parts.push('schedule callback inspection');
+    if (callbackRiskProbability >= 50) parts.push(`review callback risk at ${callbackRiskProbability}%`);
+    if (qaScore < 85) parts.push(`review QA score of ${qaScore}`);
+
+    return `${parts.join(', ')}.`;
+  }
+
+  if (owner === 'operations') {
+    const parts = ['Review margin exposure'];
+
+    if (estimatedMarginLeakPercent > 0) parts.push(`margin leak ${estimatedMarginLeakPercent}%`);
+    if (laborVariancePercent > 0) parts.push(`labor variance ${laborVariancePercent}%`);
+    if (materialVariancePercent > 0) parts.push(`material variance ${materialVariancePercent}%`);
+    if (scheduleDelayDays > 0) parts.push(`${scheduleDelayDays} schedule delay day(s)`);
+
+    return `${parts.join(', ')}.`;
+  }
+
+  if (owner === 'production_manager') {
+    const parts = ['Perform secondary QA verification'];
+
+    if (qaScore < 85) parts.push(`QA score is ${qaScore}`);
+    if (unresolvedPunchItems > 0) parts.push(`clear ${unresolvedPunchItems} punch item(s)`);
+    if (callbackRiskProbability >= 30) parts.push(`review callback risk at ${callbackRiskProbability}% before closeout`);
+
+    return `${parts.join(', ')}.`;
+  }
+
+  return 'Continue normal job progression.';
+}
+
 export function scoreRuntimeJob(event: SavedOperationalEvent): RuntimeJob {
   const payload = safeParsePayload(event.payload_json);
 
@@ -92,16 +137,17 @@ export function scoreRuntimeJob(event: SavedOperationalEvent): RuntimeJob {
       ? 'production_manager'
       : 'none';
 
-  const nextAction =
-    owner === 'service_department' && priority === 'urgent'
-      ? 'Contact homeowner, schedule callback inspection, and review QA history.'
-      : owner === 'operations' && priority === 'urgent'
-      ? 'Review margin leak, labor overage, material variance, and schedule delay today.'
-      : owner === 'operations'
-      ? 'Review margin and schedule exposure.'
-      : owner === 'production_manager'
-      ? 'Perform secondary QA verification.'
-      : 'Continue normal job progression.';
+  const nextAction = buildNextAction(
+    owner,
+    priority,
+    qaScore,
+    callbackRiskProbability,
+    unresolvedPunchItems,
+    estimatedMarginLeakPercent,
+    laborVariancePercent,
+    materialVariancePercent,
+    scheduleDelayDays
+  );
 
   return {
     jobId: event.job_id,

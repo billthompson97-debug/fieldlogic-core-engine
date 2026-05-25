@@ -4,6 +4,14 @@ interface SavedOperationalEvent {
   payload_json: string;
 }
 
+interface LatestActionOutcome {
+  action_completed: string;
+  outcome: string;
+  completed_by: string;
+  notes: string | null;
+  created_at: string;
+}
+
 export interface JobSummary {
   jobId: string;
   healthScore: number;
@@ -11,6 +19,13 @@ export interface JobSummary {
   priority: 'normal' | 'elevated' | 'urgent';
   owner: 'none' | 'production_manager' | 'service_department' | 'operations';
   nextAction: string;
+  completedAction?: {
+    actionCompleted: string;
+    outcome: string;
+    completedBy: string;
+    notes?: string | null;
+    completedAt: string;
+  };
   activeRisks: string[];
   anomalies: string[];
   recommendations: string[];
@@ -28,6 +43,28 @@ function safeParsePayload(payloadJson: string): Record<string, unknown> {
 
 function toNumber(value: unknown, fallback: number): number {
   return typeof value === 'number' ? value : fallback;
+}
+
+function adjustForCompletedAction(
+  healthScore: number,
+  callbackRiskProbability: number,
+  outcome?: string
+): { healthScore: number; callbackRiskProbability: number } {
+  if (outcome === 'resolved') {
+    return {
+      healthScore: Math.min(100, healthScore + 25),
+      callbackRiskProbability: Math.max(0, callbackRiskProbability - 25)
+    };
+  }
+
+  if (outcome === 'improved') {
+    return {
+      healthScore: Math.min(100, healthScore + 15),
+      callbackRiskProbability: Math.max(0, callbackRiskProbability - 15)
+    };
+  }
+
+  return { healthScore, callbackRiskProbability };
 }
 
 function determinePriority(
@@ -92,8 +129,17 @@ function determineNextAction(
   estimatedMarginLeakPercent: number,
   laborVariancePercent: number,
   materialVariancePercent: number,
-  scheduleDelayDays: number
+  scheduleDelayDays: number,
+  latestActionOutcome?: LatestActionOutcome | null
 ): string {
+  if (latestActionOutcome?.outcome === 'resolved') {
+    return 'Action resolved. Monitor job before final closeout.';
+  }
+
+  if (latestActionOutcome?.outcome === 'improved') {
+    return 'Action improved the job. Monitor before closeout and confirm no new issues appear.';
+  }
+
   if (owner === 'service_department') {
     const parts = ['Contact homeowner'];
 
@@ -143,6 +189,17 @@ export async function handleJobSummaryRequest(
     .bind(jobId)
     .first<SavedOperationalEvent>();
 
+  const latestActionOutcome = await db
+    .prepare(
+      `SELECT action_completed, outcome, completed_by, notes, created_at
+       FROM action_outcomes
+       WHERE job_id = ?
+       ORDER BY created_at DESC
+       LIMIT 1`
+    )
+    .bind(jobId)
+    .first<LatestActionOutcome>();
+
   if (!latestEvent) {
     return new Response(
       JSON.stringify(
@@ -170,7 +227,7 @@ export async function handleJobSummaryRequest(
 
   const payload = safeParsePayload(latestEvent.payload_json);
   const qaScore = toNumber(payload.qaScore, 90);
-  const callbackRiskProbability = toNumber(payload.callbackRiskProbability, qaScore < 85 ? 38 : 12);
+  const baseCallbackRiskProbability = toNumber(payload.callbackRiskProbability, qaScore < 85 ? 38 : 12);
   const unresolvedPunchItems = toNumber(payload.unresolvedPunchItems, 0);
   const estimatedMarginLeakPercent = toNumber(payload.estimatedMarginLeakPercent, 0);
   const laborVariancePercent = toNumber(payload.laborVariancePercent, 0);
@@ -186,7 +243,7 @@ export async function handleJobSummaryRequest(
     recommendations.push('Perform secondary QA verification');
   }
 
-  if (callbackRiskProbability >= 40) {
+  if (baseCallbackRiskProbability >= 40) {
     activeRisks.push('callback_risk_watch');
     recommendations.push('Review callback prevention steps before closeout');
   }
@@ -213,12 +270,12 @@ export async function handleJobSummaryRequest(
     anomalies.push('schedule_delay_detected');
   }
 
-  const healthScore = Math.max(
+  const baseHealthScore = Math.max(
     0,
     Math.round(
       100 -
         (100 - qaScore) * 0.8 -
-        callbackRiskProbability * 0.25 -
+        baseCallbackRiskProbability * 0.25 -
         unresolvedPunchItems * 4 -
         estimatedMarginLeakPercent * 1.5 -
         laborVariancePercent * 0.4 -
@@ -227,34 +284,50 @@ export async function handleJobSummaryRequest(
     )
   );
 
+  const adjusted = adjustForCompletedAction(
+    baseHealthScore,
+    baseCallbackRiskProbability,
+    latestActionOutcome?.outcome
+  );
+
   const priority = determinePriority(
-    healthScore,
-    callbackRiskProbability,
+    adjusted.healthScore,
+    adjusted.callbackRiskProbability,
     unresolvedPunchItems,
     estimatedMarginLeakPercent,
     laborVariancePercent,
     scheduleDelayDays
   );
-  const owner = determineOwner(latestEvent.event_type, callbackRiskProbability, unresolvedPunchItems);
+  const owner = determineOwner(latestEvent.event_type, adjusted.callbackRiskProbability, unresolvedPunchItems);
   const nextAction = determineNextAction(
     owner,
     priority,
     qaScore,
-    callbackRiskProbability,
+    adjusted.callbackRiskProbability,
     unresolvedPunchItems,
     estimatedMarginLeakPercent,
     laborVariancePercent,
     materialVariancePercent,
-    scheduleDelayDays
+    scheduleDelayDays,
+    latestActionOutcome
   );
 
   const summary: JobSummary = {
     jobId,
-    healthScore,
-    callbackRiskProbability,
+    healthScore: adjusted.healthScore,
+    callbackRiskProbability: adjusted.callbackRiskProbability,
     priority,
     owner,
     nextAction,
+    completedAction: latestActionOutcome
+      ? {
+          actionCompleted: latestActionOutcome.action_completed,
+          outcome: latestActionOutcome.outcome,
+          completedBy: latestActionOutcome.completed_by,
+          notes: latestActionOutcome.notes,
+          completedAt: latestActionOutcome.created_at
+        }
+      : undefined,
     activeRisks,
     anomalies,
     recommendations,
